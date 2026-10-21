@@ -1,0 +1,306 @@
+:root {
+  --bleu: #003b71;
+  --bleu-vif: #0a1ab0;
+  --jaune: #ffcc00;
+  --vert: #2e7d32;
+  --orange: #e65100;
+  --fond: #f2f5fa;
+  --carte: #ffffff;
+  --texte: #14213d;
+  --muted: #5b6675;
+  --bordure: #e2e8f0;
+  --accent-texte: #003b71;
+  --alerte: #fff6d6;
+  --ombre: 0 1px 2px rgba(20, 33, 61, 0.06), 0 8px 24px rgba(20, 33, 61, 0.08);
+  --rayon: 16px;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --fond: #0b1220;
+    --carte: #141e30;
+    --texte: #e8edf5;
+    --muted: #9aa6b8;
+    --bordure: #24314a;
+    --accent-texte: #8ec5ff;
+    --alerte: #352b10;
+    --ombre: 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--texte);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--jaune);
+  outline-offset: 2px;
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--fond);
+}
+
+/* En-tête */
+.entete {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, var(--bleu) 0%, var(--bleu-vif) 100%);
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(0, 59, 113, 0.25);
+}
+
+.langue {
+  font-size: 0.82rem;
+  padding: 6px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  max-width: 50%;
+  cursor: pointer;
+}
+
+.langue option {
+  color: var(--texte);
+  background: var(--carte);
+}
+
+.bandeau-fictif {
+  margin: 0;
+  padding: 6px 16px;
+  font-size: 0.75rem;
+  text-align: center;
+  background: var(--alerte);
+  color: var(--muted);
+}
+
+/* Contenu, avec une entrée douce à chaque changement d'écran */
+.contenu {
+  flex: 1;
+  padding: 18px 16px 24px;
+}
+
+.contenu > section {
+  animation: entree 320ms ease-out;
+}
+
+@keyframes entree {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contenu > section {
+    animation: none;
+  }
+}
+
+h1 {
+  font-size: 1.45rem;
+  line-height: 1.2;
+  margin: 4px 0 14px;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: 1.02rem;
+  margin: 4px 0 10px;
+}
+
+p {
+  line-height: 1.5;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+/* Boutons */
+button {
+  padding: 11px 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--bleu);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+  box-shadow: 0 4px 12px rgba(0, 59, 113, 0.2);
+}
+
+button:hover {
+  background: var(--bleu-vif);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button:disabled {
+  background: var(--muted);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+button.principal {
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--bleu) 0%, var(--bleu-vif) 100%);
+  font-size: 1rem;
+}
+
+/* Champs de saisie */
+.saisie {
+  display: flex;
+  gap: 8px;
+}
+
+.saisie input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--bordure);
+  border-radius: 12px;
+  background: var(--carte);
+  color: var(--texte);
+  font-size: 1rem;
+}
+
+.saisie input:focus {
+  border-color: var(--bleu-vif);
+}
+
+.erreur {
+  color: var(--orange);
+  font-size: 0.9rem;
+}
+
+/* Cartes */
+.carte-bloc {
+  background: var(--carte);
+  border-radius: var(--rayon);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--ombre);
+  border: 1px solid var(--bordure);
+}
+
+.alerte {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--alerte);
+  border-left: 4px solid var(--jaune);
+  font-size: 0.92rem;
+}
+
+/* Navigation basse */
+.onglets {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-around;
+  gap: 2px;
+  padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--carte) 88%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--bordure);
+  overflow-x: auto;
+}
+
+.onglet {
+  flex: 1 0 auto;
+  min-width: 54px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 4px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 500;
+  box-shadow: none;
+  border-radius: 12px;
+}
+
+.onglet:hover {
+  background: transparent;
+  color: var(--texte);
+}
+
+.onglet svg {
+  transition: transform 160ms ease;
+}
+
+.onglet.actif {
+  color: var(--accent-texte);
+  font-weight: 700;
+  background: transparent;
+}
+
+.onglet.actif svg {
+  transform: translateY(-1px) scale(1.08);
+}
+
+.onglet.actif span {
+  position: relative;
+}
+
+.onglet.actif span::after {
+  content: '';
+  display: block;
+  width: 16px;
+  height: 3px;
+  margin: 3px auto 0;
+  border-radius: 3px;
+  background: var(--jaune);
+}
+
+/* Carte Leaflet : coins arrondis et ombre */
+.carte {
+  height: 260px;
+  width: 100%;
+  border-radius: var(--rayon);
+  margin-bottom: 12px;
+  box-shadow: var(--ombre);
+  border: 1px solid var(--bordure);
+}

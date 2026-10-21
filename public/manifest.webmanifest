@@ -1,0 +1,9 @@
+{
+  "name": "GLS Relais (démo)",
+  "short_name": "GLS Relais",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f9",
+  "theme_color": "#003b71",
+  "lang": "fr"
+}

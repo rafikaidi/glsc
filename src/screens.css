@@ -1,0 +1,461 @@
+/* Styles des écrans : profil, envoi, parrainage, aide, impact, retrait, suivi. */
+
+/* Marque dans l'en-tête */
+.marque {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+}
+
+.logo-gls {
+  border-radius: 8px;
+  display: block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.logo-relais {
+  display: block;
+}
+
+.reseau-repris {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+}
+
+/* Suivi : frise verticale avec points */
+.suivi-carte {
+  padding: 18px;
+}
+
+.suivi-colis {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.numero-colis {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent-texte);
+}
+
+.frise {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 18px;
+  position: relative;
+}
+
+.frise li {
+  position: relative;
+  padding: 0 0 18px 30px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.frise li:last-child {
+  padding-bottom: 0;
+}
+
+.frise li::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--carte);
+  border: 2px solid var(--bordure);
+  box-sizing: border-box;
+}
+
+.frise li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 16px;
+  bottom: 0;
+  width: 2px;
+  background: var(--bordure);
+}
+
+.frise li.fait {
+  color: var(--texte);
+  font-weight: 600;
+}
+
+.frise li.fait::before {
+  background: var(--bleu);
+  border-color: var(--bleu);
+  box-shadow: 0 0 0 4px rgba(0, 59, 113, 0.15);
+}
+
+.frise li.fait:not(:last-child)::after {
+  background: var(--bleu);
+}
+
+/* Carte : légende et liste */
+.legende {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.8rem;
+  margin: 0 0 14px;
+  color: var(--muted);
+}
+
+.legende i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.liste-points {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.liste-points li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 14px;
+  box-shadow: var(--ombre);
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.liste-points li.choisi {
+  border: 2px solid var(--bleu);
+  padding: 11px 13px;
+}
+
+.liste-points li strong {
+  font-size: 0.95rem;
+}
+
+.liste-points li > button {
+  flex-shrink: 0;
+  padding: 9px 14px;
+  font-size: 0.85rem;
+}
+
+/* Retrait : billet avec QR */
+.qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 16px;
+  background: #fff;
+  color: #14213d;
+  text-align: center;
+}
+
+.qr .muted {
+  color: #5b6675;
+}
+
+.qr svg {
+  border-radius: 10px;
+}
+
+/* Profil */
+.profil-entete {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, var(--bleu) 0%, var(--bleu-vif) 100%);
+  color: #fff;
+  border: none;
+}
+
+.profil-entete .muted {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--jaune);
+  color: var(--bleu);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.badge {
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  vertical-align: middle;
+}
+
+.liste-simple {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.liste-simple li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 0;
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--bordure);
+}
+
+.liste-simple li:last-child {
+  border-bottom: none;
+}
+
+button.secondaire {
+  background: var(--carte);
+  color: var(--accent-texte);
+  border: 1px solid var(--bordure);
+  width: 100%;
+  margin-top: 10px;
+  box-shadow: var(--ombre);
+}
+
+button.secondaire:hover {
+  background: var(--carte);
+  border-color: var(--bleu-vif);
+}
+
+/* Formulaires : champs et sélection par cartes */
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  padding: 0;
+  min-width: 0;
+}
+
+.champ input,
+.champ select,
+.champ textarea {
+  padding: 12px 14px;
+  border: 1px solid var(--bordure);
+  border-radius: 12px;
+  background: var(--carte);
+  color: var(--texte);
+  font-size: 1rem;
+  font-weight: 400;
+  font-family: inherit;
+  width: 100%;
+}
+
+.champ input:focus,
+.champ select:focus,
+.champ textarea:focus {
+  outline: none;
+  border-color: var(--bleu-vif);
+  box-shadow: 0 0 0 3px rgba(10, 26, 176, 0.15);
+}
+
+.champ legend {
+  padding: 0;
+  margin-bottom: 8px;
+}
+
+fieldset.champ {
+  gap: 8px;
+}
+
+fieldset.champ label.ligne-toggle {
+  border: 1px solid var(--bordure);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: var(--carte);
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+fieldset.champ label.ligne-toggle:has(input:checked) {
+  border-color: var(--bleu);
+  background: color-mix(in srgb, var(--bleu) 8%, var(--carte));
+  font-weight: 700;
+}
+
+.ligne-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ligne-toggle input[type='checkbox'],
+.ligne-toggle input[type='radio'] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--bleu);
+  flex-shrink: 0;
+}
+
+/* Envoi : confirmation */
+.envoi-ok {
+  text-align: center;
+}
+
+/* Parrainage : carte cadeau */
+.code-parrain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  padding: 24px 16px;
+  background: linear-gradient(135deg, var(--jaune) 0%, #ffe066 100%);
+  color: var(--bleu);
+  border: none;
+}
+
+.code-parrain .muted {
+  color: var(--bleu);
+  opacity: 0.8;
+}
+
+.code {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 1.6rem;
+  letter-spacing: 3px;
+  color: var(--bleu);
+  background: rgba(255, 255, 255, 0.55);
+  padding: 6px 14px;
+  border-radius: 12px;
+}
+
+.actions-ligne {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.actions-ligne button {
+  min-width: 130px;
+}
+
+.code-parrain button.secondaire {
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--bleu);
+  border: none;
+}
+
+/* Aide : FAQ en accordéon */
+.faq {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  box-shadow: var(--ombre);
+}
+
+.faq summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq summary::after {
+  content: '+';
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--accent-texte);
+  transition: transform 160ms ease;
+}
+
+.faq[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.faq p {
+  margin: 10px 0 0;
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+/* Impact CO2 */
+.resultat-co2 {
+  text-align: center;
+  padding: 22px 16px;
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+  border-color: transparent;
+}
+
+.resultat-co2 .muted {
+  color: #3d5a40;
+}
+
+.grand-chiffre {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--vert);
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .resultat-co2 {
+    background: linear-gradient(135deg, #1b2e1f 0%, #1f2a1a 100%);
+  }
+
+  :root:not([data-theme='light']) .resultat-co2 .muted {
+    color: #b7cdb9;
+  }
+
+  :root:not([data-theme='light']) .grand-chiffre {
+    color: #7bd38a;
+  }
+}
