@@ -459,3 +459,26 @@ fieldset.champ label.ligne-toggle:has(input:checked) {
     color: #7bd38a;
   }
 }
+
+/* Bouton favori ★ de la liste des points relais : texte seul, pas de bouton plein. */
+.etoile,
+.etoile:hover {
+  background: transparent;
+  box-shadow: none;
+  color: var(--muted);
+  font-size: 1.3rem;
+  line-height: 1;
+  padding: 4px 6px;
+}
+
+.etoile[aria-pressed='true'] {
+  color: #f5b700;
+}
+
+/* Message de confirmation (favori enregistré). */
+.succes {
+  color: var(--succes);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 8px 0 0;
+}

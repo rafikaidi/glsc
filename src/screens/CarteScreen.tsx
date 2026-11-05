@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { CircleMarker, MapContainer, Popup, TileLayer, useMap } from 'react-leaflet'
 import { LogoRelaisColis } from '../components/Logo'
-import { points, type PointRelais, type TypePoint } from '../data/points'
+import { points, type TypePoint } from '../data/points'
 import { setPointFavori, usePrefs } from '../data/prefs'
 import { useLangue } from '../i18n'
 import { haversineKm, toulouseCentre, useGeolocate, type Coordonnees } from '../utils/distance'
@@ -17,11 +17,16 @@ interface Props {
   onChoisir: (id: string) => void
 }
 
-function Recadrage({ centre }: { centre: Coordonnees }) {
+// Recentre la carte une seule fois, quand la position réelle arrive.
+// Sinon chaque mise à jour GPS écrase le déplacement manuel de l'utilisateur.
+function Recadrage({ centre, actif }: { centre: Coordonnees; actif: boolean }) {
   const carte = useMap()
+  const dejaCentre = useRef(false)
   useEffect(() => {
+    if (!actif || dejaCentre.current) return
+    dejaCentre.current = true
     carte.setView([centre.lat, centre.lng], carte.getZoom())
-  }, [centre.lat, centre.lng, carte])
+  }, [actif, centre.lat, centre.lng, carte])
   return null
 }
 
@@ -31,31 +36,30 @@ export function CarteScreen({ pointChoisiId, onChoisir }: Props) {
   const { pointFavori } = usePrefs()
   const [recherche, setRecherche] = useState('')
 
-  // Clé primitive stable : évite de recréer l'objet `origine` à chaque rendu.
-  const lat = geoloc.statut === 'ok' ? geoloc.pos.lat : toulouseCentre.lat
-  const lng = geoloc.statut === 'ok' ? geoloc.pos.lng : toulouseCentre.lng
+  const geolocOk = geoloc.statut === 'ok'
+  const centreCarte: Coordonnees = geoloc.statut === 'ok' ? geoloc.pos : toulouseCentre
 
+  // Clés primitives stables pour la mémoïsation.
+  const lat = centreCarte.lat
+  const lng = centreCarte.lng
+
+  // Les distances ne sont affichées et le tri ne s'applique qu'avec une vraie position.
   const avecDistance = useMemo(() => {
     const origine: Coordonnees = { lat, lng }
-    return points
-      .map((p) => ({ ...p, km: haversineKm(origine, p) }))
-      .sort((a, b) => a.km - b.km)
-  }, [lat, lng])
+    const liste = points.map((p) => ({ ...p, km: haversineKm(origine, p) }))
+    return geolocOk ? liste.sort((a, b) => a.km - b.km) : liste
+  }, [lat, lng, geolocOk])
 
-  const favori = withDistanceFind(avecDistance, pointFavori)
-  const horsZone = favori !== null && favori.km > 50
+  const favori = pointFavori ? avecDistance.find((p) => p.id === pointFavori) ?? null : null
+  const horsZone = geolocOk && favori !== null && favori.km > 50
 
   const q = recherche.trim().toLowerCase()
   const filtres = q
     ? avecDistance.filter((p) => p.nom.toLowerCase().includes(q) || p.adresse.toLowerCase().includes(q))
-    : horsZone
-      ? avecDistance.filter((p) => p.id !== favori.id)
-      : avecDistance
+    : avecDistance
 
   const distanceLabel = (km: number) =>
     km < 1 ? t('carte.distanceProche') : t('carte.distance', { km: km.toFixed(1).replace('.', ',') })
-
-  const centreCarte: Coordonnees = geoloc.statut === 'ok' ? geoloc.pos : { lat: 43.6045, lng: 1.4442 }
 
   return (
     <section>
@@ -80,7 +84,7 @@ export function CarteScreen({ pointChoisiId, onChoisir }: Props) {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <Recadrage centre={centreCarte} />
+        <Recadrage centre={centreCarte} actif={geolocOk} />
         {filtres.map((p) => (
           <CircleMarker
             key={p.id}
@@ -90,8 +94,12 @@ export function CarteScreen({ pointChoisiId, onChoisir }: Props) {
           >
             <Popup>
               <strong>{p.nom}</strong>
-              <br />
-              {distanceLabel(p.km)}
+              {geolocOk && (
+                <>
+                  <br />
+                  {distanceLabel(p.km)}
+                </>
+              )}
             </Popup>
           </CircleMarker>
         ))}
@@ -105,7 +113,7 @@ export function CarteScreen({ pointChoisiId, onChoisir }: Props) {
         ))}
       </div>
 
-      {geoloc.statut !== 'ok' && <p className="muted">{t('carte.pasDeGeoloc')}</p>}
+      {!geolocOk && <p className="muted">{t('carte.pasDeGeoloc')}</p>}
 
       {filtres.length === 0 && <p className="erreur">{t('carte.aucunResultat')}</p>}
 
@@ -118,8 +126,8 @@ export function CarteScreen({ pointChoisiId, onChoisir }: Props) {
                 {p.id === pointFavori && <span className="badge">{t('carte.favori')}</span>}
               </strong>
               <div className="muted">
-                {distanceLabel(p.km)} · {p.adresse} · {p.horaires} · {t('carte.capacite')}{' '}
-                {t(`cap.${p.capacite}`)}
+                {geolocOk && <>{distanceLabel(p.km)} · </>}
+                {p.adresse} · {p.horaires} · {t('carte.capacite')} {t(`cap.${p.capacite}`)}
               </div>
             </div>
             <button
@@ -142,8 +150,4 @@ export function CarteScreen({ pointChoisiId, onChoisir }: Props) {
       </ul>
     </section>
   )
-}
-
-function withDistanceFind(liste: (PointRelais & { km: number })[], id: string | null) {
-  return id ? liste.find((p) => p.id === id) ?? null : null
 }
