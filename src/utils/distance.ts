@@ -25,14 +25,18 @@ export type EtatGeoloc =
   | { statut: 'refusee' }
   | { statut: 'ok'; pos: Coordonnees }
 
+// Géolocalisation indisponible (SSR ou navigateur très ancien) : détectée une seule fois au rendu.
+const geolocIndisponible =
+  typeof navigator === 'undefined' || !('geolocation' in navigator)
+
 export function useGeolocate(): EtatGeoloc {
-  const [etat, setEtat] = useState<EtatGeoloc>({ statut: 'idle' })
+  // Initialisation directe : évite un setState synchrone dans l'effet (double rendu).
+  const [etat, setEtat] = useState<EtatGeoloc>(
+    geolocIndisponible ? { statut: 'refusee' } : { statut: 'idle' },
+  )
 
   useEffect(() => {
-    if (typeof navigator === 'undefined' || !('geolocation' in navigator)) {
-      setEtat({ statut: 'refusee' })
-      return
-    }
+    if (geolocIndisponible) return
     const id = navigator.geolocation.watchPosition(
       (p) => setEtat({ statut: 'ok', pos: { lat: p.coords.latitude, lng: p.coords.longitude } }),
       () => setEtat({ statut: 'refusee' }),

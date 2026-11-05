@@ -31,15 +31,16 @@ export function CarteScreen({ pointChoisiId, onChoisir }: Props) {
   const { pointFavori } = usePrefs()
   const [recherche, setRecherche] = useState('')
 
-  const origine: Coordonnees = geoloc.statut === 'ok' ? geoloc.pos : toulouseCentre
+  // Clé primitive stable : évite de recréer l'objet `origine` à chaque rendu.
+  const lat = geoloc.statut === 'ok' ? geoloc.pos.lat : toulouseCentre.lat
+  const lng = geoloc.statut === 'ok' ? geoloc.pos.lng : toulouseCentre.lng
 
-  const avecDistance = useMemo(
-    () =>
-      points
-        .map((p) => ({ ...p, km: haversineKm(origine, p) }))
-        .sort((a, b) => a.km - b.km),
-    [origine.lat, origine.lng],
-  )
+  const avecDistance = useMemo(() => {
+    const origine: Coordonnees = { lat, lng }
+    return points
+      .map((p) => ({ ...p, km: haversineKm(origine, p) }))
+      .sort((a, b) => a.km - b.km)
+  }, [lat, lng])
 
   const favori = withDistanceFind(avecDistance, pointFavori)
   const horsZone = favori !== null && favori.km > 50
