@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { colisDemo } from './data/colis'
 import { points } from './data/points'
+import { usePrefs } from './data/prefs'
 import { Logo } from './components/Logo'
 import { Icone, type NomIcone } from './components/Icone'
 import { languesDisponibles, useLangue, type Langue } from './i18n'
@@ -34,7 +35,11 @@ export default function App() {
   const [pointId, setPointId] = useState<string | null>(null)
 
   const colis = colisDemo.find((c) => c.numero === numero) ?? colisDemo[0]
-  const pointChoisi = points.find((p) => p.id === (pointId ?? colis.pointId)) ?? null
+  const { pointFavori } = usePrefs()
+  const pointActifId = pointId ?? colis.pointId
+  const pointChoisi = points.find((p) => p.id === pointActifId) ?? null
+  // Sans point sélectionné pour ce colis, on retombe sur le favori si la géoloc n'a rien fourni.
+  const pointRetrait = pointChoisi ?? points.find((p) => p.id === pointFavori) ?? null
 
   return (
     <div className="app">
@@ -75,7 +80,9 @@ export default function App() {
             }}
           />
         )}
-        {ecran === 'retrait' && <RetraitScreen colis={colis} point={pointChoisi} />}
+        {ecran === 'retrait' && (
+          <RetraitScreen colis={colis} point={pointRetrait} onChangerPoint={() => setEcran('carte')} />
+        )}
         {ecran === 'envoyer' && <EnvoiScreen />}
         {ecran === 'parrainage' && <ParrainageScreen />}
         {ecran === 'profil' && (

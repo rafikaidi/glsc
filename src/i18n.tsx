@@ -18,7 +18,7 @@ const fr: Dictionnaire = {
   'suivi.titre': 'Suivre mon colis',
   'suivi.placeholder': 'Numéro de colis',
   'suivi.bouton': 'Suivre',
-  'suivi.inconnu': 'Numéro inconnu. Essaie GLS-TLS-0001 ou GLS-TLS-0002.',
+  'suivi.inconnu': 'Numéro inconnu. Essaie 78541239087654 ou 78541239087655.',
   'suivi.de': 'Colis de {expediteur} · {numero}',
   'suivi.point': 'Point de retrait :',
   'suivi.voirPoints': 'Voir les points relais',
@@ -110,6 +110,17 @@ const fr: Dictionnaire = {
   'impact.zero': 'Aucun trajet dédié évité : tu passes déjà par le point.',
   'impact.groupage': 'Un point relais mutualise les livraisons : un seul passage du livreur dessert plusieurs clients.',
   'impact.hypotheses': "Estimation indicative. Facteurs d'émission fictifs (0,22 kg/km en voiture, 0,03 kg/km en transports), à valider avec des données sourcées.",
+  'suivi.dateEstimee': 'Disponible à partir du {date}',
+  'suivi.lieu': '{lieu} · {date}',
+  'carte.recherche': 'Rechercher une adresse, un nom de point',
+  'carte.aucunResultat': 'Aucun point ne correspond à ta recherche.',
+  'carte.distance': 'à {km} km',
+  'carte.distanceProche': 'à moins de 1 km',
+  'carte.pasDeGeoloc': 'Active la localisation pour trier par distance.',
+  'carte.favori': 'Favori',
+  'carte.defautFavori': 'Ton point favori est hors zone : voici les points les plus proches.',
+  'retrait.changerPoint': 'Changer de point relais',
+  'profil.pointFavoriSet': 'Point favori enregistré',
 }
 
 const it: Dictionnaire = {
@@ -126,7 +137,7 @@ const it: Dictionnaire = {
   'suivi.titre': 'Segui il mio pacco',
   'suivi.placeholder': 'Numero del pacco',
   'suivi.bouton': 'Segui',
-  'suivi.inconnu': 'Numero sconosciuto. Prova GLS-TLS-0001 o GLS-TLS-0002.',
+  'suivi.inconnu': 'Numero sconosciuto. Prova 78541239087654 o 78541239087655.',
   'suivi.de': 'Pacco di {expediteur} · {numero}',
   'suivi.point': 'Punto di ritiro:',
   'suivi.voirPoints': 'Vedi i punti di ritiro',
@@ -218,6 +229,17 @@ const it: Dictionnaire = {
   'impact.zero': 'Nessun viaggio dedicato evitato: passi già dal punto.',
   'impact.groupage': 'Un punto di ritiro raggruppa le consegne: un solo passaggio del corriere serve più clienti.',
   'impact.hypotheses': 'Stima indicativa. Fattori di emissione fittizi (0,22 kg/km in auto, 0,03 kg/km con i mezzi), da validare con dati di fonte.',
+  'suivi.dateEstimee': 'Disponibile dal {date}',
+  'suivi.lieu': '{lieu} · {date}',
+  'carte.recherche': 'Cerca un indirizzo o un punto di ritiro',
+  'carte.aucunResultat': 'Nessun punto corrisponde alla ricerca.',
+  'carte.distance': 'a {km} km',
+  'carte.distanceProche': 'a meno di 1 km',
+  'carte.pasDeGeoloc': 'Attiva la localizzazione per ordinare per distanza.',
+  'carte.favori': 'Preferito',
+  'carte.defautFavori': 'Il tuo punto preferito è fuori zona: ecco i punti più vicini.',
+  'retrait.changerPoint': 'Cambia punto di ritiro',
+  'profil.pointFavoriSet': 'Punto preferito salvato',
 }
 
 const nl: Dictionnaire = {
@@ -234,7 +256,7 @@ const nl: Dictionnaire = {
   'suivi.titre': 'Mijn pakket volgen',
   'suivi.placeholder': 'Pakketnummer',
   'suivi.bouton': 'Volgen',
-  'suivi.inconnu': 'Onbekend nummer. Probeer GLS-TLS-0001 of GLS-TLS-0002.',
+  'suivi.inconnu': 'Onbekend nummer. Probeer 78541239087654 of 78541239087655.',
   'suivi.de': 'Pakket van {expediteur} · {numero}',
   'suivi.point': 'Ophaalpunt:',
   'suivi.voirPoints': 'Bekijk de pickuppunten',
@@ -326,6 +348,17 @@ const nl: Dictionnaire = {
   'impact.zero': 'Geen aparte rit bespaard: je komt al langs het punt.',
   'impact.groupage': 'Een pickuppunt bundelt leveringen: één passage van de koerier bedient meerdere klanten.',
   'impact.hypotheses': 'Indicatieve schatting. Fictieve emissiefactoren (0,22 kg/km met de auto, 0,03 kg/km met openbaar vervoer), te valideren met bronnen.',
+  'suivi.dateEstimee': 'Beschikbaar vanaf {date}',
+  'suivi.lieu': '{lieu} · {date}',
+  'carte.recherche': 'Zoek een adres of een pickuppunt',
+  'carte.aucunResultat': 'Geen punt gevonden voor je zoekopdracht.',
+  'carte.distance': 'op {km} km',
+  'carte.distanceProche': 'minder dan 1 km',
+  'carte.pasDeGeoloc': 'Schakel locatie in om te sorteren op afstand.',
+  'carte.favori': 'Favoriet',
+  'carte.defautFavori': 'Je favoriete punt ligt buiten het gebied: hier zijn de dichtstbijzijnde punten.',
+  'retrait.changerPoint': 'Kies een ander punt',
+  'profil.pointFavoriSet': 'Favoriet punt opgeslagen',
 }
 
 export const dictionnaires: Record<Langue, Dictionnaire> = { fr, it, nl }
@@ -343,6 +376,7 @@ type Traduire = (cle: string, vars?: Record<string, string | number>) => string
 
 interface ContexteLangue {
   langue: Langue
+  codeIntl: string
   setLangue: (langue: Langue) => void
   t: Traduire
   jours: (n: number) => string
@@ -382,7 +416,7 @@ export function LangueProvider({ children }: { children: ReactNode }) {
 
   const jours = (n: number) => (n <= 1 ? t('jours.un') : t('jours.n', { n }))
 
-  return <Contexte.Provider value={{ langue, setLangue, t, jours }}>{children}</Contexte.Provider>
+  return <Contexte.Provider value={{ langue, codeIntl: langue, setLangue, t, jours }}>{children}</Contexte.Provider>
 }
 
 export function useLangue(): ContexteLangue {

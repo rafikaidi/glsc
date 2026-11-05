@@ -27,7 +27,9 @@ export function EnvoiScreen() {
       return
     }
     setErreur(false)
-    setNumero(`GLS-TLS-${Math.floor(1000 + Math.random() * 9000)}`)
+    // Numéro au format GLS (14 chiffres) pour rester cohérent avec le suivi de la démo.
+    const suffixe = String(Math.floor(10000000 + Math.random() * 89999999))
+    setNumero(`78541239${suffixe}`)
   }
 
   if (numero) {

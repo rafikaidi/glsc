@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { colisDemo } from '../data/colis'
 import { points } from '../data/points'
+import { setPointFavori, usePrefs } from '../data/prefs'
 import { useLangue } from '../i18n'
 
 interface Props {
@@ -10,10 +11,16 @@ interface Props {
 
 export function ProfilScreen({ onVoirAide, onVoirImpact }: Props) {
   const { t } = useLangue()
-  const [pointFavori, setPointFavori] = useState('p1')
+  const { pointFavori } = usePrefs()
   const [notifs, setNotifs] = useState({ sms: true, email: false, push: true })
+  const [favoriEnregistre, setFavoriEnregistre] = useState(false)
 
   const basculer = (cle: keyof typeof notifs) => setNotifs((n) => ({ ...n, [cle]: !n[cle] }))
+
+  const choisirFavori = (id: string) => {
+    setPointFavori(id)
+    setFavoriEnregistre(true)
+  }
 
   return (
     <section>
@@ -30,12 +37,14 @@ export function ProfilScreen({ onVoirAide, onVoirImpact }: Props) {
       <div className="carte-bloc">
         <label className="champ">
           {t('profil.point')}
-          <select value={pointFavori} onChange={(e) => setPointFavori(e.target.value)}>
+          <select value={pointFavori ?? ''} onChange={(e) => choisirFavori(e.target.value)}>
+            <option value="" disabled>—</option>
             {points.map((p) => (
               <option key={p.id} value={p.id}>{p.nom}</option>
             ))}
           </select>
         </label>
+        {favoriEnregistre && <p className="succes">{t('profil.pointFavoriSet')}</p>}
       </div>
 
       <div className="carte-bloc">

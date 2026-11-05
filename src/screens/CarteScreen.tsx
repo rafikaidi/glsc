@@ -1,7 +1,10 @@
-import { CircleMarker, MapContainer, Popup, TileLayer } from 'react-leaflet'
+import { useEffect, useMemo, useState } from 'react'
+import { CircleMarker, MapContainer, Popup, TileLayer, useMap } from 'react-leaflet'
 import { LogoRelaisColis } from '../components/Logo'
-import { points, type TypePoint } from '../data/points'
+import { points, type PointRelais, type TypePoint } from '../data/points'
+import { setPointFavori, usePrefs } from '../data/prefs'
 import { useLangue } from '../i18n'
+import { haversineKm, toulouseCentre, useGeolocate, type Coordonnees } from '../utils/distance'
 
 const couleurs: Record<TypePoint, string> = {
   GLS: '#003b71',
@@ -14,8 +17,44 @@ interface Props {
   onChoisir: (id: string) => void
 }
 
+function Recadrage({ centre }: { centre: Coordonnees }) {
+  const carte = useMap()
+  useEffect(() => {
+    carte.setView([centre.lat, centre.lng], carte.getZoom())
+  }, [centre.lat, centre.lng, carte])
+  return null
+}
+
 export function CarteScreen({ pointChoisiId, onChoisir }: Props) {
   const { t } = useLangue()
+  const geoloc = useGeolocate()
+  const { pointFavori } = usePrefs()
+  const [recherche, setRecherche] = useState('')
+
+  const origine: Coordonnees = geoloc.statut === 'ok' ? geoloc.pos : toulouseCentre
+
+  const avecDistance = useMemo(
+    () =>
+      points
+        .map((p) => ({ ...p, km: haversineKm(origine, p) }))
+        .sort((a, b) => a.km - b.km),
+    [origine.lat, origine.lng],
+  )
+
+  const favori = withDistanceFind(avecDistance, pointFavori)
+  const horsZone = favori !== null && favori.km > 50
+
+  const q = recherche.trim().toLowerCase()
+  const filtres = q
+    ? avecDistance.filter((p) => p.nom.toLowerCase().includes(q) || p.adresse.toLowerCase().includes(q))
+    : horsZone
+      ? avecDistance.filter((p) => p.id !== favori.id)
+      : avecDistance
+
+  const distanceLabel = (km: number) =>
+    km < 1 ? t('carte.distanceProche') : t('carte.distance', { km: km.toFixed(1).replace('.', ',') })
+
+  const centreCarte: Coordonnees = geoloc.statut === 'ok' ? geoloc.pos : { lat: 43.6045, lng: 1.4442 }
 
   return (
     <section>
@@ -24,19 +63,35 @@ export function CarteScreen({ pointChoisiId, onChoisir }: Props) {
         <LogoRelaisColis hauteur={56} /> <span className="muted">{t('carte.reseau')}</span>
       </p>
 
-      <MapContainer center={[43.6045, 1.4442]} zoom={13} className="carte" scrollWheelZoom={false}>
+      <label className="champ">
+        <input
+          value={recherche}
+          onChange={(e) => setRecherche(e.target.value)}
+          aria-label={t('carte.recherche')}
+          placeholder={t('carte.recherche')}
+        />
+      </label>
+
+      {horsZone && !q && <p className="alerte">{t('carte.defautFavori')}</p>}
+
+      <MapContainer center={[centreCarte.lat, centreCarte.lng]} zoom={13} className="carte" scrollWheelZoom={false}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {points.map((p) => (
+        <Recadrage centre={centreCarte} />
+        {filtres.map((p) => (
           <CircleMarker
             key={p.id}
             center={[p.lat, p.lng]}
             radius={p.id === pointChoisiId ? 12 : 8}
             pathOptions={{ color: couleurs[p.type], fillColor: couleurs[p.type], fillOpacity: 0.9 }}
           >
-            <Popup>{p.nom}</Popup>
+            <Popup>
+              <strong>{p.nom}</strong>
+              <br />
+              {distanceLabel(p.km)}
+            </Popup>
           </CircleMarker>
         ))}
       </MapContainer>
@@ -49,15 +104,31 @@ export function CarteScreen({ pointChoisiId, onChoisir }: Props) {
         ))}
       </div>
 
+      {geoloc.statut !== 'ok' && <p className="muted">{t('carte.pasDeGeoloc')}</p>}
+
+      {filtres.length === 0 && <p className="erreur">{t('carte.aucunResultat')}</p>}
+
       <ul className="liste-points">
-        {points.map((p) => (
+        {filtres.map((p) => (
           <li key={p.id} className={p.id === pointChoisiId ? 'choisi' : ''}>
             <div>
-              <strong>{p.nom}</strong>
+              <strong>
+                {p.nom}{' '}
+                {p.id === pointFavori && <span className="badge">{t('carte.favori')}</span>}
+              </strong>
               <div className="muted">
-                {p.adresse} · {p.horaires} · {t('carte.capacite')} {t(`cap.${p.capacite}`)}
+                {distanceLabel(p.km)} · {p.adresse} · {p.horaires} · {t('carte.capacite')}{' '}
+                {t(`cap.${p.capacite}`)}
               </div>
             </div>
+            <button
+              className="etoile"
+              aria-pressed={p.id === pointFavori}
+              aria-label={t('profil.point')}
+              onClick={() => setPointFavori(p.id === pointFavori ? null : p.id)}
+            >
+              ★
+            </button>
             <button
               onClick={() => onChoisir(p.id)}
               disabled={p.capacite === 'pleine'}
@@ -70,4 +141,8 @@ export function CarteScreen({ pointChoisiId, onChoisir }: Props) {
       </ul>
     </section>
   )
+}
+
+function withDistanceFind(liste: (PointRelais & { km: number })[], id: string | null) {
+  return id ? liste.find((p) => p.id === id) ?? null : null
 }

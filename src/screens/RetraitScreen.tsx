@@ -6,6 +6,7 @@ import { useLangue } from '../i18n'
 interface Props {
   colis: Colis
   point: PointRelais | null
+  onChangerPoint: () => void
 }
 
 function joursRestants(colis: Colis): number {
@@ -13,7 +14,7 @@ function joursRestants(colis: Colis): number {
   return Math.max(0, Math.ceil(colis.joursPourRetirer - ecoule))
 }
 
-export function RetraitScreen({ colis, point }: Props) {
+export function RetraitScreen({ colis, point, onChangerPoint }: Props) {
   const { t, jours } = useLangue()
 
   if (!point) {
@@ -54,6 +55,8 @@ export function RetraitScreen({ colis, point }: Props) {
       </div>
 
       <p className="muted">{t('retrait.delai', { numero: colis.numero, jours: jours(restants) })}</p>
+
+      <button className="secondaire" onClick={onChangerPoint}>{t('retrait.changerPoint')}</button>
     </section>
   )
 }
